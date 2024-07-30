@@ -1,5 +1,5 @@
 
-FROM node:alpine
+FROM node:18.17.0-alpine
 
 WORKDIR /app
  
@@ -10,8 +10,6 @@ RUN npm install -g typescript
 RUN npm install
 
 COPY . .
-
-RUN npm run build
 
 EXPOSE 3000
 
