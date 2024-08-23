@@ -153,7 +153,7 @@ ROS2D.ImageMapClient.prototype.__proto__ = EventEmitter2.prototype;
 ROS2D.OccupancyGrid = function (options) {
   options = options || {};
   var message = options.message;
-
+  console.log(message);
   // internal drawing canvas
   var canvas = document.createElement("canvas");
   var context = canvas.getContext("2d");
@@ -264,6 +264,8 @@ ROS2D.OccupancyGridClient = function (options) {
       index = that.rootObject.getChildIndex(that.currentGrid);
       that.rootObject.removeChild(that.currentGrid);
     }
+
+    console.log("index = " + index);
 
     that.currentGrid = new ROS2D.OccupancyGrid({
       message: message,

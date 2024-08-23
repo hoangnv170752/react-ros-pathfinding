@@ -1663,106 +1663,6 @@
     ],
     5: [
       function (require, module, exports) {
-        var bundleFn = arguments[3];
-        var sources = arguments[4];
-        var cache = arguments[5];
-
-        var stringify = JSON.stringify;
-
-        module.exports = function (fn, options) {
-          var wkey;
-          var cacheKeys = Object.keys(cache);
-
-          for (var i = 0, l = cacheKeys.length; i < l; i++) {
-            var key = cacheKeys[i];
-            var exp = cache[key].exports;
-            // Using babel as a transpiler to use esmodule, the export will always
-            // be an object with the default export as a property of it. To ensure
-            // the existing api and babel esmodule exports are both supported we
-            // check for both
-            if (exp === fn || (exp && exp.default === fn)) {
-              wkey = key;
-              break;
-            }
-          }
-
-          if (!wkey) {
-            wkey = Math.floor(Math.pow(16, 8) * Math.random()).toString(16);
-            var wcache = {};
-            for (var i = 0, l = cacheKeys.length; i < l; i++) {
-              var key = cacheKeys[i];
-              wcache[key] = key;
-            }
-            sources[wkey] = [
-              "function(require,module,exports){" + fn + "(self); }",
-              wcache,
-            ];
-          }
-          var skey = Math.floor(Math.pow(16, 8) * Math.random()).toString(16);
-
-          var scache = {};
-          scache[wkey] = wkey;
-          sources[skey] = [
-            "function(require,module,exports){" +
-              // try to call default if defined to also support babel esmodule exports
-              "var f = require(" +
-              stringify(wkey) +
-              ");" +
-              "(f.default ? f.default : f)(self);" +
-              "}",
-            scache,
-          ];
-
-          var workerSources = {};
-          resolveSources(skey);
-
-          function resolveSources(key) {
-            workerSources[key] = true;
-
-            for (var depPath in sources[key][1]) {
-              var depKey = sources[key][1][depPath];
-              if (!workerSources[depKey]) {
-                resolveSources(depKey);
-              }
-            }
-          }
-
-          var src =
-            "(" +
-            bundleFn +
-            ")({" +
-            Object.keys(workerSources)
-              .map(function (key) {
-                return (
-                  stringify(key) +
-                  ":[" +
-                  sources[key][0] +
-                  "," +
-                  stringify(sources[key][1]) +
-                  "]"
-                );
-              })
-              .join(",") +
-            "},{},[" +
-            stringify(skey) +
-            "])";
-          var URL =
-            window.URL || window.webkitURL || window.mozURL || window.msURL;
-
-          var blob = new Blob([src], { type: "text/javascript" });
-          if (options && options.bare) {
-            return blob;
-          }
-          var workerUrl = URL.createObjectURL(blob);
-          var worker = new Worker(workerUrl);
-          worker.objectURL = workerUrl;
-          return worker;
-        };
-      },
-      {},
-    ],
-    6: [
-      function (require, module, exports) {
         /**
          * @fileOverview
          * @author Russell Toris - rctoris@wpi.edu
@@ -1774,7 +1674,7 @@
          * If you use nodejs, this is the variable you get when you require('roslib')
          */
         var ROSLIB = this.ROSLIB || {
-          REVISION: "1.1.0",
+          REVISION: "1.0.1",
         };
 
         var assign = require("object-assign");
@@ -1793,15 +1693,15 @@
         module.exports = ROSLIB;
       },
       {
-        "./actionlib": 12,
-        "./core": 21,
-        "./math": 26,
-        "./tf": 29,
-        "./urdf": 41,
+        "./actionlib": 11,
+        "./core": 20,
+        "./math": 25,
+        "./tf": 28,
+        "./urdf": 40,
         "object-assign": 3,
       },
     ],
-    7: [
+    6: [
       function (require, module, exports) {
         (function (global) {
           global.ROSLIB = require("./RosLib");
@@ -1816,9 +1716,9 @@
             : {}
         ));
       },
-      { "./RosLib": 6 },
+      { "./RosLib": 5 },
     ],
-    8: [
+    7: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -1970,9 +1870,9 @@
 
         module.exports = ActionClient;
       },
-      { "../core/Message": 13, "../core/Topic": 20, eventemitter2: 2 },
+      { "../core/Message": 12, "../core/Topic": 19, eventemitter2: 2 },
     ],
-    9: [
+    8: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -2060,9 +1960,9 @@
 
         module.exports = ActionListener;
       },
-      { "../core/Message": 13, "../core/Topic": 20, eventemitter2: 2 },
+      { "../core/Message": 12, "../core/Topic": 19, eventemitter2: 2 },
     ],
-    10: [
+    9: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -2154,9 +2054,9 @@
 
         module.exports = Goal;
       },
-      { "../core/Message": 13, eventemitter2: 2 },
+      { "../core/Message": 12, eventemitter2: 2 },
     ],
-    11: [
+    10: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -2378,9 +2278,9 @@
 
         module.exports = SimpleActionServer;
       },
-      { "../core/Message": 13, "../core/Topic": 20, eventemitter2: 2 },
+      { "../core/Message": 12, "../core/Topic": 19, eventemitter2: 2 },
     ],
-    12: [
+    11: [
       function (require, module, exports) {
         var Ros = require("../core/Ros");
         var mixin = require("../mixin");
@@ -2395,15 +2295,15 @@
         mixin(Ros, ["ActionClient", "SimpleActionServer"], action);
       },
       {
-        "../core/Ros": 15,
-        "../mixin": 27,
-        "./ActionClient": 8,
-        "./ActionListener": 9,
-        "./Goal": 10,
-        "./SimpleActionServer": 11,
+        "../core/Ros": 14,
+        "../mixin": 26,
+        "./ActionClient": 7,
+        "./ActionListener": 8,
+        "./Goal": 9,
+        "./SimpleActionServer": 10,
       },
     ],
-    13: [
+    12: [
       function (require, module, exports) {
         /**
          * @fileoverview
@@ -2426,7 +2326,7 @@
       },
       { "object-assign": 3 },
     ],
-    14: [
+    13: [
       function (require, module, exports) {
         /**
          * @fileoverview
@@ -2512,9 +2412,9 @@
 
         module.exports = Param;
       },
-      { "./Service": 16, "./ServiceRequest": 17 },
+      { "./Service": 15, "./ServiceRequest": 16 },
     ],
-    15: [
+    14: [
       function (require, module, exports) {
         /**
          * @fileoverview
@@ -2522,7 +2422,6 @@
          */
 
         var WebSocket = require("ws");
-        var WorkerSocket = require("../util/workerSocket");
         var socketAdapter = require("./SocketAdapter.js");
 
         var Service = require("./Service");
@@ -2545,7 +2444,7 @@
          * @param options - possible keys include: <br>
          *   * url (optional) - (can be specified later with `connect`) the WebSocket URL for rosbridge or the node server url to connect using socket.io (if socket.io exists in the page) <br>
          *   * groovyCompatibility - don't use interfaces that changed after the last groovy release or rosbridge_suite and related tools (defaults to true)
-         *   * transportLibrary (optional) - one of 'websocket', 'workersocket' (default), 'socket.io' or RTCPeerConnection instance controlling how the connection is created in `connect`.
+         *   * transportLibrary (optional) - one of 'websocket' (default), 'socket.io' or RTCPeerConnection instance controlling how the connection is created in `connect`.
          *   * transportOptions (optional) - the options to use use when creating a connection. Currently only used if `transportLibrary` is RTCPeerConnection.
          */
         function Ros(options) {
@@ -2598,18 +2497,12 @@
               ),
               socketAdapter(this)
             );
-          } else if (this.transportLibrary === "websocket") {
+          } else {
             if (!this.socket || this.socket.readyState === WebSocket.CLOSED) {
               var sock = new WebSocket(url);
               sock.binaryType = "arraybuffer";
               this.socket = assign(sock, socketAdapter(this));
             }
-          } else if (this.transportLibrary === "workersocket") {
-            this.socket = assign(new WorkerSocket(url), socketAdapter(this));
-          } else {
-            throw (
-              "Unknown transportLibrary: " + this.transportLibrary.toString()
-            );
           }
         };
 
@@ -2703,10 +2596,7 @@
         /**
          * Retrieves Action Servers in ROS as an array of string
          *
-         * @param callback function with params:
          *   * actionservers - Array of action server names
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
          */
         Ros.prototype.getActionServers = function (callback, failedCallback) {
           var getActionServers = new Service({
@@ -2738,9 +2628,6 @@
          *
          * @param callback function with params:
          *   * topics - Array of topic names
-         *   * types - Array of message type names
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
          */
         Ros.prototype.getTopics = function (callback, failedCallback) {
           var topicsClient = new Service({
@@ -2770,11 +2657,9 @@
         /**
          * Retrieves Topics in ROS as an array as specific type
          *
-         * @param topicType topic type to find
+         * @param topicType topic type to find:
          * @param callback function with params:
          *   * topics - Array of topic names
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
          */
         Ros.prototype.getTopicsForType = function (
           topicType,
@@ -2812,8 +2697,6 @@
          *
          * @param callback - function with the following params:
          *   * services - array of service names
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
          */
         Ros.prototype.getServices = function (callback, failedCallback) {
           var servicesClient = new Service({
@@ -2843,11 +2726,9 @@
         /**
          * Retrieves list of services in ROS as an array as specific type
          *
-         * @param serviceType service type to find
+         * @param serviceType service type to find:
          * @param callback function with params:
          *   * topics - Array of service names
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
          */
         Ros.prototype.getServicesForType = function (
           serviceType,
@@ -2886,8 +2767,6 @@
          * @param service name of service:
          * @param callback - function with params:
          *   * type - String of the service type
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
          */
         Ros.prototype.getServiceRequestDetails = function (
           type,
@@ -2923,11 +2802,9 @@
         /**
          * Retrieves a detail of ROS service request.
          *
-         * @param service name of service
+         * @param service name of service:
          * @param callback - function with params:
          *   * type - String of the service type
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
          */
         Ros.prototype.getServiceResponseDetails = function (
           type,
@@ -2965,8 +2842,6 @@
          *
          * @param callback - function with the following params:
          *   * nodes - array of node names
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
          */
         Ros.prototype.getNodes = function (callback, failedCallback) {
           var nodesClient = new Service({
@@ -3001,8 +2876,6 @@
          *   * publications - array of published topic names
          *   * subscriptions - array of subscribed topic names
          *   * services - array of service names hosted
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
          */
         Ros.prototype.getNodeDetails = function (
           node,
@@ -3044,8 +2917,6 @@
          *
          * @param callback function with params:
          *  * params - array of param names.
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
          */
         Ros.prototype.getParams = function (callback, failedCallback) {
           var paramsClient = new Service({
@@ -3077,8 +2948,6 @@
          * @param topic name of the topic:
          * @param callback - function with params:
          *   * type - String of the topic type
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
          */
         Ros.prototype.getTopicType = function (
           topic,
@@ -3117,8 +2986,6 @@
          * @param service name of service:
          * @param callback - function with params:
          *   * type - String of the service type
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
          */
         Ros.prototype.getServiceType = function (
           service,
@@ -3154,11 +3021,9 @@
         /**
          * Retrieves a detail of ROS message.
          *
-         * @param message - String of a topic type
          * @param callback - function with params:
          *   * details - Array of the message detail
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
+         * @param message - String of a topic type
          */
         Ros.prototype.getMessageDetails = function (
           message,
@@ -3242,58 +3107,18 @@
           return decodeTypeDefsRec(defs[0], defs);
         };
 
-        /**
-         * Retrieves list of topics and their associated type definitions.
-         *
-         * @param callback function with params:
-         *   * topics - Array of topic names
-         *   * types - Array of message type names
-         *   * typedefs_full_text - Array of full definitions of message types, similar to `gendeps --cat`
-         * @param failedCallback - the callback function when the service call failed (optional). Params:
-         *   * error - the error message reported by ROS
-         *
-         */
-        Ros.prototype.getTopicsAndRawTypes = function (
-          callback,
-          failedCallback
-        ) {
-          var topicsAndRawTypesClient = new Service({
-            ros: this,
-            name: "/rosapi/topics_and_raw_types",
-            serviceType: "rosapi/TopicsAndRawTypes",
-          });
-
-          var request = new ServiceRequest();
-          if (typeof failedCallback === "function") {
-            topicsAndRawTypesClient.callService(
-              request,
-              function (result) {
-                callback(result);
-              },
-              function (message) {
-                failedCallback(message);
-              }
-            );
-          } else {
-            topicsAndRawTypesClient.callService(request, function (result) {
-              callback(result);
-            });
-          }
-        };
-
         module.exports = Ros;
       },
       {
-        "../util/workerSocket": 47,
-        "./Service": 16,
-        "./ServiceRequest": 17,
-        "./SocketAdapter.js": 19,
+        "./Service": 15,
+        "./ServiceRequest": 16,
+        "./SocketAdapter.js": 18,
         eventemitter2: 2,
         "object-assign": 3,
-        ws: 43,
+        ws: 42,
       },
     ],
-    16: [
+    15: [
       function (require, module, exports) {
         /**
          * @fileoverview
@@ -3424,9 +3249,9 @@
 
         module.exports = Service;
       },
-      { "./ServiceRequest": 17, "./ServiceResponse": 18, eventemitter2: 2 },
+      { "./ServiceRequest": 16, "./ServiceResponse": 17, eventemitter2: 2 },
     ],
-    17: [
+    16: [
       function (require, module, exports) {
         /**
          * @fileoverview
@@ -3449,7 +3274,7 @@
       },
       { "object-assign": 3 },
     ],
-    18: [
+    17: [
       function (require, module, exports) {
         /**
          * @fileoverview
@@ -3472,7 +3297,7 @@
       },
       { "object-assign": 3 },
     ],
-    19: [
+    18: [
       function (require, module, exports) {
         /**
          * Socket event handling utilities for handling events on either
@@ -3487,6 +3312,7 @@
         var decompressPng = require("../util/decompressPng");
         var CBOR = require("cbor-js");
         var typedArrayTagger = require("../util/cborTypedArrayTags");
+        var WebSocket = require("ws");
         var BSON = null;
         if (typeof bson !== "undefined") {
           BSON = bson().BSON;
@@ -3599,12 +3425,13 @@
         module.exports = SocketAdapter;
       },
       {
-        "../util/cborTypedArrayTags": 42,
-        "../util/decompressPng": 45,
+        "../util/cborTypedArrayTags": 41,
+        "../util/decompressPng": 44,
         "cbor-js": 1,
+        ws: 42,
       },
     ],
-    20: [
+    19: [
       function (require, module, exports) {
         /**
          * @fileoverview
@@ -3626,7 +3453,7 @@
          *   * ros - the ROSLIB.Ros connection handle
          *   * name - the topic name, like /cmd_vel
          *   * messageType - the message type, like 'std_msgs/String'
-         *   * compression - the type of compression to use, like 'png', 'cbor', or 'cbor-raw'
+         *   * compression - the type of compression to use, like 'png' or 'cbor'
          *   * throttle_rate - the rate (in ms in between messages) at which to throttle the topics
          *   * queue_size - the queue created at bridge side for re-publishing webtopics (defaults to 100)
          *   * latch - latch the topic when publishing
@@ -3644,17 +3471,13 @@
           this.latch = options.latch || false;
           this.queue_size = options.queue_size || 100;
           this.queue_length = options.queue_length || 0;
-          this.reconnect_on_close =
-            options.reconnect_on_close !== undefined
-              ? options.reconnect_on_close
-              : true;
+          this.reconnect_on_close = options.reconnect_on_close || true;
 
           // Check for valid compression types
           if (
             this.compression &&
             this.compression !== "png" &&
             this.compression !== "cbor" &&
-            this.compression !== "cbor-raw" &&
             this.compression !== "none"
           ) {
             this.emit(
@@ -3834,9 +3657,9 @@
 
         module.exports = Topic;
       },
-      { "./Message": 13, eventemitter2: 2 },
+      { "./Message": 12, eventemitter2: 2 },
     ],
-    21: [
+    20: [
       function (require, module, exports) {
         var mixin = require("../mixin");
 
@@ -3853,17 +3676,17 @@
         mixin(core.Ros, ["Param", "Service", "Topic"], core);
       },
       {
-        "../mixin": 27,
-        "./Message": 13,
-        "./Param": 14,
-        "./Ros": 15,
-        "./Service": 16,
-        "./ServiceRequest": 17,
-        "./ServiceResponse": 18,
-        "./Topic": 20,
+        "../mixin": 26,
+        "./Message": 12,
+        "./Param": 13,
+        "./Ros": 14,
+        "./Service": 15,
+        "./ServiceRequest": 16,
+        "./ServiceResponse": 17,
+        "./Topic": 19,
       },
     ],
-    22: [
+    21: [
       function (require, module, exports) {
         /**
          * @fileoverview
@@ -3941,9 +3764,9 @@
 
         module.exports = Pose;
       },
-      { "./Quaternion": 23, "./Vector3": 25 },
+      { "./Quaternion": 22, "./Vector3": 24 },
     ],
-    23: [
+    22: [
       function (require, module, exports) {
         /**
          * @fileoverview
@@ -4050,7 +3873,7 @@
       },
       {},
     ],
-    24: [
+    23: [
       function (require, module, exports) {
         /**
          * @fileoverview
@@ -4086,9 +3909,9 @@
 
         module.exports = Transform;
       },
-      { "./Quaternion": 23, "./Vector3": 25 },
+      { "./Quaternion": 22, "./Vector3": 24 },
     ],
-    25: [
+    24: [
       function (require, module, exports) {
         /**
          * @fileoverview
@@ -4161,7 +3984,7 @@
       },
       {},
     ],
-    26: [
+    25: [
       function (require, module, exports) {
         module.exports = {
           Pose: require("./Pose"),
@@ -4170,9 +3993,9 @@
           Vector3: require("./Vector3"),
         };
       },
-      { "./Pose": 22, "./Quaternion": 23, "./Transform": 24, "./Vector3": 25 },
+      { "./Pose": 21, "./Quaternion": 22, "./Transform": 23, "./Vector3": 24 },
     ],
-    27: [
+    26: [
       function (require, module, exports) {
         /**
          * Mixin a feature to the core/Ros prototype.
@@ -4194,7 +4017,7 @@
       },
       {},
     ],
-    28: [
+    27: [
       function (require, module, exports) {
         /**
          * @fileoverview
@@ -4206,7 +4029,6 @@
 
         var Service = require("../core/Service.js");
         var ServiceRequest = require("../core/ServiceRequest.js");
-        var Topic = require("../core/Topic.js");
 
         var Transform = require("../math/Transform");
 
@@ -4251,8 +4073,7 @@
           this.republisherUpdateRequested = false;
 
           // Create an Action client
-          this.actionClient = new ActionClient({
-            ros: options.ros,
+          this.actionClient = this.ros.ActionClient({
             serverName: this.serverName,
             actionName: "tf2_web_republisher/TFSubscriptionAction",
             omitStatus: true,
@@ -4260,8 +4081,7 @@
           });
 
           // Create a Service client
-          this.serviceClient = new Service({
-            ros: options.ros,
+          this.serviceClient = this.ros.Service({
             name: this.repubServiceName,
             serviceType: "tf2_web_republisher/RepublishTFs",
           });
@@ -4348,8 +4168,7 @@
             this.currentTopic.unsubscribe();
           }
 
-          this.currentTopic = new Topic({
-            ros: this.ros,
+          this.currentTopic = this.ros.Topic({
             name: response.topic_name,
             messageType: "tf2_web_republisher/TFArray",
           });
@@ -4420,15 +4239,14 @@
         module.exports = TFClient;
       },
       {
-        "../actionlib/ActionClient": 8,
-        "../actionlib/Goal": 10,
-        "../core/Service.js": 16,
-        "../core/ServiceRequest.js": 17,
-        "../core/Topic.js": 20,
-        "../math/Transform": 24,
+        "../actionlib/ActionClient": 7,
+        "../actionlib/Goal": 9,
+        "../core/Service.js": 15,
+        "../core/ServiceRequest.js": 16,
+        "../math/Transform": 23,
       },
     ],
-    29: [
+    28: [
       function (require, module, exports) {
         var Ros = require("../core/Ros");
         var mixin = require("../mixin");
@@ -4439,9 +4257,9 @@
 
         mixin(Ros, ["TFClient"], tf);
       },
-      { "../core/Ros": 15, "../mixin": 27, "./TFClient": 28 },
+      { "../core/Ros": 14, "../mixin": 26, "./TFClient": 27 },
     ],
-    30: [
+    29: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -4474,9 +4292,9 @@
 
         module.exports = UrdfBox;
       },
-      { "../math/Vector3": 25, "./UrdfTypes": 39 },
+      { "../math/Vector3": 24, "./UrdfTypes": 38 },
     ],
-    31: [
+    30: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -4504,7 +4322,7 @@
       },
       {},
     ],
-    32: [
+    31: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -4529,9 +4347,9 @@
 
         module.exports = UrdfCylinder;
       },
-      { "./UrdfTypes": 39 },
+      { "./UrdfTypes": 38 },
     ],
-    33: [
+    32: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -4629,9 +4447,9 @@
 
         module.exports = UrdfJoint;
       },
-      { "../math/Pose": 22, "../math/Quaternion": 23, "../math/Vector3": 25 },
+      { "../math/Pose": 21, "../math/Quaternion": 22, "../math/Vector3": 24 },
     ],
-    34: [
+    33: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -4664,9 +4482,9 @@
 
         module.exports = UrdfLink;
       },
-      { "./UrdfVisual": 40 },
+      { "./UrdfVisual": 39 },
     ],
-    35: [
+    34: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -4717,9 +4535,9 @@
 
         module.exports = UrdfMaterial;
       },
-      { "./UrdfColor": 31, "object-assign": 3 },
+      { "./UrdfColor": 30, "object-assign": 3 },
     ],
-    36: [
+    35: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -4758,9 +4576,9 @@
 
         module.exports = UrdfMesh;
       },
-      { "../math/Vector3": 25, "./UrdfTypes": 39 },
+      { "../math/Vector3": 24, "./UrdfTypes": 38 },
     ],
-    37: [
+    36: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -4857,9 +4675,9 @@
 
         module.exports = UrdfModel;
       },
-      { "./UrdfJoint": 33, "./UrdfLink": 34, "./UrdfMaterial": 35, xmldom: 46 },
+      { "./UrdfJoint": 32, "./UrdfLink": 33, "./UrdfMaterial": 34, xmldom: 45 },
     ],
-    38: [
+    37: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -4883,9 +4701,9 @@
 
         module.exports = UrdfSphere;
       },
-      { "./UrdfTypes": 39 },
+      { "./UrdfTypes": 38 },
     ],
-    39: [
+    38: [
       function (require, module, exports) {
         module.exports = {
           URDF_SPHERE: 0,
@@ -4896,7 +4714,7 @@
       },
       {},
     ],
-    40: [
+    39: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -4926,8 +4744,6 @@
           this.origin = null;
           this.geometry = null;
           this.material = null;
-
-          this.name = options.xml.getAttribute("name");
 
           // Origin
           var origins = xml.getElementsByTagName("origin");
@@ -5034,17 +4850,17 @@
         module.exports = UrdfVisual;
       },
       {
-        "../math/Pose": 22,
-        "../math/Quaternion": 23,
-        "../math/Vector3": 25,
-        "./UrdfBox": 30,
-        "./UrdfCylinder": 32,
-        "./UrdfMaterial": 35,
-        "./UrdfMesh": 36,
-        "./UrdfSphere": 38,
+        "../math/Pose": 21,
+        "../math/Quaternion": 22,
+        "../math/Vector3": 24,
+        "./UrdfBox": 29,
+        "./UrdfCylinder": 31,
+        "./UrdfMaterial": 34,
+        "./UrdfMesh": 35,
+        "./UrdfSphere": 37,
       },
     ],
-    41: [
+    40: [
       function (require, module, exports) {
         module.exports = require("object-assign")(
           {
@@ -5062,20 +4878,20 @@
         );
       },
       {
-        "./UrdfBox": 30,
-        "./UrdfColor": 31,
-        "./UrdfCylinder": 32,
-        "./UrdfLink": 34,
-        "./UrdfMaterial": 35,
-        "./UrdfMesh": 36,
-        "./UrdfModel": 37,
-        "./UrdfSphere": 38,
-        "./UrdfTypes": 39,
-        "./UrdfVisual": 40,
+        "./UrdfBox": 29,
+        "./UrdfColor": 30,
+        "./UrdfCylinder": 31,
+        "./UrdfLink": 33,
+        "./UrdfMaterial": 34,
+        "./UrdfMesh": 35,
+        "./UrdfModel": 36,
+        "./UrdfSphere": 37,
+        "./UrdfTypes": 38,
+        "./UrdfVisual": 39,
         "object-assign": 3,
       },
     ],
-    42: [
+    41: [
       function (require, module, exports) {
         "use strict";
 
@@ -5200,14 +5016,13 @@
       },
       {},
     ],
-    43: [
+    42: [
       function (require, module, exports) {
-        module.exports =
-          typeof window !== "undefined" ? window.WebSocket : WebSocket;
+        module.exports = window.WebSocket;
       },
       {},
     ],
-    44: [
+    43: [
       function (require, module, exports) {
         /* global document */
         module.exports = function Canvas() {
@@ -5216,7 +5031,7 @@
       },
       {},
     ],
-    45: [
+    44: [
       function (require, module, exports) {
         /**
          * @fileOverview
@@ -5284,9 +5099,9 @@
 
         module.exports = decompressPng;
       },
-      { canvas: 44 },
+      { canvas: 43 },
     ],
-    46: [
+    45: [
       function (require, module, exports) {
         exports.DOMImplementation = window.DOMImplementation;
         exports.XMLSerializer = window.XMLSerializer;
@@ -5294,112 +5109,7 @@
       },
       {},
     ],
-    47: [
-      function (require, module, exports) {
-        var work = require("webworkify");
-        var workerSocketImpl = require("./workerSocketImpl");
-
-        function WorkerSocket(uri) {
-          this.socket_ = work(workerSocketImpl);
-
-          this.socket_.addEventListener(
-            "message",
-            this.handleWorkerMessage_.bind(this)
-          );
-
-          this.socket_.postMessage({
-            uri: uri,
-          });
-        }
-
-        WorkerSocket.prototype.handleWorkerMessage_ = function (ev) {
-          var data = ev.data;
-          if (data instanceof ArrayBuffer || typeof data === "string") {
-            // binary or JSON message from rosbridge
-            this.onmessage(ev);
-          } else {
-            // control message from the wrapped WebSocket
-            var type = data.type;
-            if (type === "close") {
-              this.onclose(null);
-            } else if (type === "open") {
-              this.onopen(null);
-            } else if (type === "error") {
-              this.onerror(null);
-            } else {
-              throw "Unknown message from workersocket";
-            }
-          }
-        };
-
-        WorkerSocket.prototype.send = function (data) {
-          this.socket_.postMessage(data);
-        };
-
-        WorkerSocket.prototype.close = function () {
-          this.socket_.postMessage({
-            close: true,
-          });
-        };
-
-        module.exports = WorkerSocket;
-      },
-      { "./workerSocketImpl": 48, webworkify: 5 },
-    ],
-    48: [
-      function (require, module, exports) {
-        var WebSocket = WebSocket || require("ws");
-
-        module.exports = function (self) {
-          var socket = null;
-
-          function handleSocketMessage(ev) {
-            var data = ev.data;
-
-            if (data instanceof ArrayBuffer) {
-              // binary message, transfer for speed
-              self.postMessage(data, [data]);
-            } else {
-              // JSON message, copy string
-              self.postMessage(data);
-            }
-          }
-
-          function handleSocketControl(ev) {
-            self.postMessage({ type: ev.type });
-          }
-
-          self.addEventListener("message", function (ev) {
-            var data = ev.data;
-
-            if (typeof data === "string") {
-              // JSON message from ROSLIB
-              socket.send(data);
-            } else {
-              // control message
-              if (data.hasOwnProperty("close")) {
-                socket.close();
-                socket = null;
-              } else if (data.hasOwnProperty("uri")) {
-                var uri = data.uri;
-
-                socket = new WebSocket(uri);
-                socket.binaryType = "arraybuffer";
-
-                socket.onmessage = handleSocketMessage;
-                socket.onclose = handleSocketControl;
-                socket.onopen = handleSocketControl;
-                socket.onerror = handleSocketControl;
-              } else {
-                throw "Unknown message to WorkerSocket";
-              }
-            }
-          });
-        };
-      },
-      { ws: 43 },
-    ],
   },
   {},
-  [7]
+  [6]
 );
