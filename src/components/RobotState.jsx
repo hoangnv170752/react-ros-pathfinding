@@ -72,14 +72,12 @@ class RobotState extends Component {
   }
 
   getRobotState() {
-    //create a pose subscriber
     var pose_subscriber = new window.ROSLIB.Topic({
       ros: this.state.ros,
-      name: Config.POSE_TOPIC,
-      messageType: "geometry_msgs/PoseWithCovarianceStamped",
+      name: Config.ODOM_TOPIC,
+      messageType: "geometry_msgs/msg/Pose",
     });
 
-    //create a pose callback
     pose_subscriber.subscribe((message) => {
       this.setState({ x: message.pose.pose.position.x.toFixed(2) });
       this.setState({ y: message.pose.pose.position.y.toFixed(2) });
@@ -90,14 +88,12 @@ class RobotState extends Component {
       });
     });
 
-    //create a subscriber for the velocities in the odom topic
     var velocity_subscriber = new window.ROSLIB.Topic({
       ros: this.state.ros,
       name: Config.ODOM_TOPIC,
       messageType: "nav_msgs/Odometry",
     });
 
-    //callback function for the odom
     velocity_subscriber.subscribe((message) => {
       this.setState({
         linear_velocity: message.twist.twist.linear.x.toFixed(2),
